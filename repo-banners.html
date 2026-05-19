@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ThunderID SDK Banners</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #030c18;
+  padding: 48px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.banners {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.banner {
+  width: 1000px;
+  height: 420px;
+  background: #071526;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.layer-gradient {
+  background:
+    radial-gradient(ellipse 85% 75% at 15% 72%, #0d2d52 0%, transparent 58%),
+    radial-gradient(ellipse 55% 55% at 88% 18%, #071e3a 0%, transparent 50%),
+    linear-gradient(160deg, #071a30 0%, #040e1c 100%);
+}
+
+.layer-grid {
+  background-image:
+    linear-gradient(rgba(54,136,255,0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(54,136,255,0.032) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+.layer-glow {
+  background: radial-gradient(ellipse 60% 48% at 50% 55%, rgba(54,136,255,0.09) 0%, transparent 70%);
+}
+
+/* Simple lightning bolt watermark */
+.bolt-deco {
+  position: absolute;
+  right: -28px;
+  top: -18px;
+  width: 200px;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: 1.5px solid rgba(54,136,255,0.32);
+  border-radius: 100px;
+  color: rgba(255,255,255,0.72);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: rgba(54,136,255,0.07);
+}
+
+.logos-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.logo-box {
+  width: 94px;
+  height: 94px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-thunder {
+  background: linear-gradient(145deg, #0a1e4a 0%, #0e2868 55%, #102e7a 100%);
+  box-shadow: 0 0 40px rgba(54,136,255,0.3), inset 0 1.5px 0 rgba(255,255,255,0.12);
+}
+
+.plus-sign {
+  font-size: 28px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 200;
+  line-height: 1;
+  margin: 0 2px;
+}
+
+.pkg-name {
+  font-size: 48px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+.pkg-name .scope {
+  color: rgba(255,255,255,0.36);
+  font-weight: 700;
+}
+
+.pkg-desc {
+  font-size: 15.5px;
+  color: rgba(255,255,255,0.46);
+  text-align: center;
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+.install-box {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(3,8,18,0.72);
+  border: 1px solid rgba(54,136,255,0.18);
+  border-radius: 9px;
+  padding: 11px 20px;
+}
+
+.install-prompt {
+  color: rgba(255,255,255,0.28);
+  font-size: 13px;
+  font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  user-select: none;
+}
+
+.install-cmd {
+  color: rgba(255,255,255,0.88);
+  font-size: 13px;
+  font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.copy-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.07);
+  border-radius: 5px;
+  margin-left: 5px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.tags {
+  display: flex;
+  gap: 7px;
+}
+
+.tag {
+  padding: 4px 13px;
+  border: 1px solid rgba(54,136,255,0.22);
+  border-radius: 100px;
+  color: rgba(255,255,255,0.5);
+  font-size: 11.5px;
+  font-weight: 500;
+  background: rgba(54,136,255,0.05);
+}
+</style>
+</head>
+<body>
+<div class="banners" id="banners"></div>
+<script>
+/* Outline lightning bolt for background watermark */
+const BOLT_DECO = `<svg viewBox="0 0 56 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M38 0L5 54H26L14 100L56 44H35L38 0Z" stroke="white" stroke-width="3" stroke-linejoin="round" fill="none"/>
+</svg>`;
+
+/* ThunderID mark (white + #3688FF) for logo box */
+const THUNDER_LOGO = `<svg width="46" height="57" viewBox="0 0 207 257" fill="none">
+  <path d="M55.5 26.4L58.9 0H0V26.4H55.5Z" fill="white"/>
+  <path d="M39.9 147.4L49.6 72.3H0V256.7H60.6L80.1 147.4H39.9Z" fill="#3688FF"/>
+  <path d="M192.4 59.4C182.8 40.2 169 25.6 150.9 15.3 145.5 12.3 139.8 9.7 133.7 7.5L115.4 103.7H159.8L76.3 256.7H83.4C109.5 256.7 131.7 251.6 150.2 241.2 168.6 230.9 182.7 216.1 192.4 197 202.1 177.8 206.9 154.8 206.9 128 206.9 101.3 202.1 78.5 192.4 59.4Z" fill="#3688FF"/>
+</svg>`;
+
+const CHECK_ICON = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>`;
+
+const COPY_ICON = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+
+/* Chrome icon: 3 pie slices + white ring + blue center */
+const CHROME_ICON = `<svg width="62" height="62" viewBox="0 0 64 64" fill="none">
+  <path d="M32 32 L32 5 A27 27 0 0 1 55.4 45.5 Z" fill="#EA4335"/>
+  <path d="M32 32 L55.4 45.5 A27 27 0 0 1 8.6 45.5 Z" fill="#34A853"/>
+  <path d="M32 32 L8.6 45.5 A27 27 0 0 1 32 5 Z" fill="#FBBC05"/>
+  <circle cx="32" cy="32" r="14.5" fill="white"/>
+  <circle cx="32" cy="32" r="9.5" fill="#4285F4"/>
+</svg>`;
+
+/* Official Next.js logo mark */
+const NEXTJS_ICON = `<svg height="70" viewBox="0 0 180 180" width="70" color="black">
+  <mask height="180" id="nx_mask" maskUnits="userSpaceOnUse" width="180" x="0" y="0" style="mask-type:alpha">
+    <circle cx="90" cy="90" fill="black" r="90"/>
+  </mask>
+  <g mask="url(#nx_mask)">
+    <circle cx="90" cy="90" fill="black" r="90"/>
+    <path d="M149.508 157.52L69.142 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.165 149.508 157.52Z" fill="url(#nx_grad0)"/>
+    <rect fill="url(#nx_grad1)" height="72" width="12" x="115" y="54"/>
+  </g>
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" id="nx_grad0" x1="109" x2="144.5" y1="116.5" y2="160.5">
+      <stop stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" id="nx_grad1" x1="121" x2="120.799" y1="54" y2="106.875">
+      <stop stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>`;
+
+/* Official Nuxt icon */
+const NUXT_ICON = `<svg width="72" height="72" viewBox="0 0 512 512" fill="none">
+  <path d="M281.44 397.667H438.32C443.326 397.667 448.118 395.908 452.453 393.427C456.789 390.946 461.258 387.831 463.76 383.533C466.262 379.236 468.002 374.36 468 369.399C467.998 364.437 466.266 359.563 463.76 355.268L357.76 172.947C355.258 168.65 352.201 165.534 347.867 163.053C343.532 160.573 337.325 158.813 332.32 158.813C327.315 158.813 322.521 160.573 318.187 163.053C313.852 165.534 310.795 168.65 308.293 172.947L281.44 219.587L227.733 129.13C225.229 124.834 222.176 120.307 217.84 117.827C213.504 115.346 208.713 115 203.707 115C198.701 115 193.909 115.346 189.573 117.827C185.238 120.307 180.771 124.834 178.267 129.13L46.8267 355.268C44.3208 359.563 44.0022 364.437 44 369.399C43.9978 374.36 44.3246 379.235 46.8267 383.533C49.3288 387.83 53.7979 390.946 58.1333 393.427C62.4688 395.908 67.2603 397.667 72.2667 397.667H171.2C210.401 397.667 238.934 380.082 258.827 346.787L306.88 263.4L332.32 219.587L410.053 352.44H306.88L281.44 397.667ZM169.787 352.44H100.533L203.707 174.36L256 263.4L221.361 323.784C208.151 345.387 193.089 352.44 169.787 352.44Z" fill="#00DC82"/>
+</svg>`;
+
+/* Official Express wordmark */
+const EXPRESS_ICON = `<svg width="92" height="54" viewBox="0 0 861.6297 500" xmlns="http://www.w3.org/2000/svg">
+  <path fill="#fff" d="M822.05434 464.78529c-23.57102 8.91305-50.08664-1.16881-61.78139-23.49073l-112.4692-155.53981-16.30803-21.72701-130.51543 177.49688c-11.00437 21.35391-36.14786 31.22309-58.7396 23.05618l168.14149-225.57746L453.94772 35.178469c23.20955-8.38407 49.07747.715704 61.98587 21.727011l116.55901 157.4569L749.74175 57.518928c11.0937-21.002063 36.16603-30.356097 58.30506-21.752557l-60.70782 80.543289-82.23033 107.02469c-9.6735 8.63851-9.6735 23.77308 0 32.41158l156.61338 209.03936ZM39.626477 236.19163l13.700796-67.66046C90.953337 34.743916 244.32044-20.928337 349.83703 61.941017 411.61839 110.45615 427.0318 179.1902 424.01558 256.64057H75.94892C70.325459 394.9777 170.14188 478.51165 297.82 435.87559c42.0737-15.33669 73.74401-50.3044 84.17297-93.75842 6.74816-21.72701 17.89283-25.45896 38.29067-19.1709-6.89256 53.65922-37.9963 101.20027-84.40304 129.00732-77.62638 42.45286-173.75024 30.1679-238.204672-30.44338-31.082401-34.94215-49.844311-79.11186-53.49956-125.76104 0-7.66837-2.556118-14.82549-4.345401-21.727-.170408-12.89987-.255612-25.51006-.255612-37.83054zm36.756986-9.35539H391.14389c-1.96821-100.27654-65.2577-171.413323-149.66074-172.077907C147.52023 53.480264 80.294322 123.05782 76.153409 226.40169Z"/>
+</svg>`;
+
+const sdks = [
+  {
+    name: 'browser',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for browser developers. Drop-in identity management for modern web apps, secure by default with zero backend required.',
+    tags: ['TypeScript', 'Web APIs', 'Zero Config'],
+    fwStyle: 'background:linear-gradient(145deg,#0e1e44,#162860);box-shadow:0 0 32px rgba(66,133,244,0.3),inset 0 1px 0 rgba(255,255,255,0.1);',
+    icon: CHROME_ICON
+  },
+  {
+    name: 'javascript',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for JavaScript developers. Framework-agnostic identity management that is tree-shakeable and ESM-first.',
+    tags: ['TypeScript', 'ESM', 'Tree-shakeable'],
+    fwStyle: 'background:#F7DF1E;box-shadow:0 0 36px rgba(247,223,30,0.4),inset 0 1px 0 rgba(255,255,255,0.3);',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 512 512"><path d="M324 370c10 17 24 29 47 29c20 0 33-10 33-24c0-16-13-22-35-32l-12-5c-35-15-58-33-58-72c0-36 27-64 70-64c31 0 53 11 68 39l-37 24c-8-15-17-21-31-21c-14 0-23 9-23 21c0 14 9 20 30 29l12 5c41 18 64 35 64 76c0 43-34 67-80 67c-45 0-74-21-88-49zm-170 4c8 13 14 25 31 25c16 0 26-6 26-30V203h48v164c0 50-29 72-72 72c-39 0-61-20-72-44z" fill="#1a1a1a"/></svg>`
+  },
+  {
+    name: 'react',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for React developers. Enterprise-grade identity components with hooks, context, and pre-built UI included.',
+    tags: ['TypeScript', 'React 18+', 'Hooks'],
+    fwStyle: 'background:linear-gradient(145deg,#08161e,#0c1e30);box-shadow:0 0 32px rgba(97,218,251,0.2),inset 0 1px 0 rgba(255,255,255,0.07);',
+    icon: `<svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+      <ellipse cx="30" cy="30" rx="25" ry="8" stroke="#61DAFB" stroke-width="2.5" fill="none"/>
+      <ellipse cx="30" cy="30" rx="25" ry="8" stroke="#61DAFB" stroke-width="2.5" fill="none" transform="rotate(60 30 30)"/>
+      <ellipse cx="30" cy="30" rx="25" ry="8" stroke="#61DAFB" stroke-width="2.5" fill="none" transform="rotate(120 30 30)"/>
+      <circle cx="30" cy="30" r="3.5" fill="#61DAFB"/>
+    </svg>`
+  },
+  {
+    name: 'nextjs',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for Next.js developers. Full-stack identity management with App Router, middleware, and edge runtime support.',
+    tags: ['TypeScript', 'App Router', 'Edge Runtime'],
+    fwStyle: 'background:#000;box-shadow:0 0 32px rgba(255,255,255,0.1),inset 0 1px 0 rgba(255,255,255,0.12);',
+    icon: NEXTJS_ICON
+  },
+  {
+    name: 'node',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for Node.js developers. Server-side identity management with token verification, session handling, and webhooks.',
+    tags: ['TypeScript', 'Node 18+', 'ESM'],
+    fwStyle: 'background:linear-gradient(145deg,#0c1c0c,#112014);box-shadow:0 0 32px rgba(95,160,78,0.22),inset 0 1px 0 rgba(255,255,255,0.07);',
+    icon: `<svg width="60" height="68" viewBox="0 0 71 80" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#node_clip)" fill="#5FA04E"><path d="M35.625 79.5c-1.081 0-2.09-.288-3.028-.792l-9.59-5.686c-1.442-.792-.721-1.08-.289-1.224 1.947-.648 2.308-.792 4.327-1.944.216-.144.504-.072.72.072l7.356 4.391c.288.144.649.144.865 0l28.77-16.628c.289-.144.433-.431.433-.791V23.714c0-.36-.144-.648-.432-.792L35.986 6.366c-.288-.144-.65-.144-.865 0L6.35 22.922c-.29.144-.434.504-.434.792v33.184c0 .287.145.647.433.791l7.86 4.535c4.254 2.16 6.922-.36 6.922-2.879V26.593c0-.432.36-.864.865-.864h3.678c.432 0 .865.36.865.864v32.752c0 5.687-3.1 8.998-8.509 8.998-1.658 0-2.956 0-6.633-1.8l-7.572-4.319A6.073 6.073 0 0 1 .798 56.97V23.786a6.073 6.073 0 0 1 3.028-5.255l28.77-16.628c1.804-1.008 4.255-1.008 6.058 0l28.77 16.628a6.073 6.073 0 0 1 3.029 5.255V56.97a6.073 6.073 0 0 1-3.029 5.254l-28.77 16.628c-.865.36-1.947.648-3.029.648Z"/><path d="M44.567 56.682c-12.62 0-15.215-5.759-15.215-10.654 0-.432.36-.864.865-.864h3.75c.433 0 .793.288.793.72.577 3.815 2.235 5.687 9.879 5.687 6.057 0 8.652-1.368 8.652-4.607 0-1.871-.72-3.24-10.167-4.175-7.86-.792-12.762-2.52-12.762-8.782 0-5.83 4.903-9.285 13.123-9.285 9.23 0 13.772 3.167 14.35 10.077 0 .216-.073.432-.217.648-.144.144-.36.288-.577.288h-3.822a.844.844 0 0 1-.793-.648c-.865-3.96-3.1-5.255-9.013-5.255-6.634 0-7.427 2.304-7.427 4.031 0 2.088.937 2.736 9.879 3.887 8.869 1.152 13.05 2.808 13.05 8.998 0 6.335-5.263 9.934-14.348 9.934Z"/></g><defs><clipPath id="node_clip"><path fill="#fff" d="M0 .5h71v79H0z"/></clipPath></defs></svg>`
+  },
+  {
+    name: 'express',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for Express developers. Protect your routes and manage user sessions with simple, composable middleware.',
+    tags: ['TypeScript', 'Express 4+', 'Middleware'],
+    fwStyle: 'background:linear-gradient(145deg,#111,#1a1a1a);box-shadow:0 0 32px rgba(255,255,255,0.06),inset 0 1px 0 rgba(255,255,255,0.1);',
+    icon: EXPRESS_ICON
+  },
+  {
+    name: 'vue',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for Vue developers. Enterprise-grade identity management components. Secure by default, effortless by design.',
+    tags: ['TypeScript', 'Vue 3.x', 'Vite'],
+    fwStyle: 'background:linear-gradient(145deg,#0b1e14,#0f2618);box-shadow:0 0 32px rgba(66,184,131,0.2),inset 0 1px 0 rgba(255,255,255,0.07);',
+    icon: `<svg width="62" height="62" viewBox="0 0 62 62" fill="none">
+      <path d="M5 10L31 54 57 10H44L31 35 18 10z" fill="#42B883"/>
+      <path d="M18 10L31 35 44 10H36L31 21 26 10z" fill="#35495E"/>
+    </svg>`
+  },
+  {
+    name: 'nuxt',
+    badge: 'OFFICIAL SDK',
+    desc: 'ThunderID for Nuxt developers. Full-stack identity management with SSR-ready composables, server middleware, and auto-imports.',
+    tags: ['TypeScript', 'Nuxt 3', 'Composables'],
+    fwStyle: 'background:linear-gradient(145deg,#001508,#011d0b);box-shadow:0 0 32px rgba(0,220,130,0.2),inset 0 1px 0 rgba(255,255,255,0.07);',
+    icon: NUXT_ICON
+  },
+  {
+    name: 'react-router',
+    badge: 'OFFICIAL INTEGRATION',
+    desc: 'ThunderID for React Router developers. Identity-aware loaders, guards, and redirect utilities built for React Router 7.',
+    tags: ['TypeScript', 'React Router 7', 'Data APIs'],
+    fwStyle: 'background:linear-gradient(145deg,#1c0708,#260a0b);box-shadow:0 0 32px rgba(244,66,80,0.28),inset 0 1px 0 rgba(255,255,255,0.07);',
+    icon: `<svg width="78" height="47" viewBox="0 0 602 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M481.36 180C481.36 196.572 474.638 211.572 463.757 222.42C452.875 233.28 437.845 240 421.24 240C404.635 240 389.605 246.708 378.735 257.568C367.853 268.428 361.12 283.428 361.12 300C361.12 316.572 354.398 331.572 343.517 342.42C332.635 353.28 317.605 360 301 360C284.395 360 269.365 353.28 258.495 342.42C247.613 331.572 240.88 316.572 240.88 300C240.88 283.428 247.613 268.428 258.495 257.568C269.365 246.708 284.395 240 301 240C317.605 240 332.635 233.28 343.517 222.42C354.398 211.572 361.12 196.572 361.12 180C361.12 146.856 334.21 120 301 120C284.395 120 269.365 113.28 258.495 102.42C247.613 91.572 240.88 76.572 240.88 60C240.88 43.428 247.613 28.428 258.495 17.568C269.365 6.708 284.395 0 301 0C334.21 0 361.12 26.856 361.12 60C361.12 76.572 367.853 91.572 378.735 102.42C389.605 113.28 404.635 120 421.24 120C454.45 120 481.36 146.856 481.36 180Z" fill="#F44250"/>
+      <path d="M240.88 180C240.88 146.862 213.963 120 180.76 120C147.557 120 120.64 146.862 120.64 180C120.64 213.137 147.557 240 180.76 240C213.963 240 240.88 213.137 240.88 180Z" fill="white"/>
+      <path d="M120.64 300C120.64 266.863 93.7233 240 60.5199 240C27.3165 240 0.399902 266.863 0.399902 300C0.399902 333.138 27.3165 360 60.5199 360C93.7233 360 120.64 333.138 120.64 300Z" fill="white"/>
+      <path d="M601.6 300C601.6 266.863 574.683 240 541.48 240C508.277 240 481.36 266.863 481.36 300C481.36 333.138 508.277 360 541.48 360C574.683 360 601.6 333.138 601.6 300Z" fill="white"/>
+    </svg>`
+  },
+  {
+    name: 'tanstack-router',
+    badge: 'OFFICIAL INTEGRATION',
+    desc: 'ThunderID for TanStack Router developers. Type-safe identity management with file-based and code-based routing support.',
+    tags: ['TypeScript', 'TanStack Router', 'Type-safe'],
+    fwStyle: 'background:linear-gradient(145deg,#1a1008,#22150a);box-shadow:0 0 32px rgba(255,130,20,0.22),inset 0 1px 0 rgba(255,255,255,0.07);',
+    icon: `<img src="https://tanstack.com/images/logos/logo-color-600.png" width="72" height="72" style="object-fit:contain;"/>`
+  },
+  {
+    name: 'skills',
+    badge: 'OFFICIAL SKILLS',
+    desc: 'Official agent skills for ThunderID. Add AI-powered identity workflows, scaffolding helpers, and code recipes to your development environment.',
+    tags: ['Claude Code', 'AI Workflows', 'Recipes'],
+    hideInstall: true,
+    fwStyle: 'background:linear-gradient(145deg,#1a0a30,#240e45);box-shadow:0 0 36px rgba(144,85,255,0.32),inset 0 1.5px 0 rgba(255,255,255,0.12);',
+    icon: `<svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M29 4 L32.2 25.8 L54 29 L32.2 32.2 L29 54 L25.8 32.2 L4 29 L25.8 25.8 Z" fill="#A855F7"/>
+      <path d="M49 10 L50.6 17.4 L58 19 L50.6 20.6 L49 28 L47.4 20.6 L40 19 L47.4 17.4 Z" fill="#C084FC" opacity="0.75"/>
+      <path d="M14 40 L15.2 45.8 L21 47 L15.2 48.2 L14 54 L12.8 48.2 L7 47 L12.8 45.8 Z" fill="#DDD6FE" opacity="0.55"/>
+    </svg>`
+  }
+];
+
+function createBanner(sdk) {
+  return `
+  <div class="banner">
+    <div class="layer layer-gradient"></div>
+    <div class="layer layer-grid"></div>
+    <div class="layer layer-glow"></div>
+    <div class="bolt-deco">${BOLT_DECO}</div>
+
+    <div class="content">
+      <div class="badge">${CHECK_ICON} ${sdk.badge}</div>
+
+      <div class="logos-row">
+        <div class="logo-box logo-thunder">${THUNDER_LOGO}</div>
+        <span class="plus-sign">+</span>
+        <div class="logo-box" style="${sdk.fwStyle}">${sdk.icon}</div>
+      </div>
+
+      <div class="pkg-name"><span class="scope">@thunderid/</span>${sdk.name}</div>
+      <div class="pkg-desc">${sdk.desc}</div>
+
+      ${sdk.hideInstall ? '' : `<div class="install-box">
+        <span class="install-prompt">$</span>
+        <span class="install-cmd">${sdk.installCmd || `npm install @thunderid/${sdk.name}`}</span>
+        <div class="copy-btn">${COPY_ICON}</div>
+      </div>`}
+
+    </div>
+  </div>`;
+}
+
+const THUNDER_LOGO_MAIN = `<svg width="92" height="114" viewBox="0 0 207 257" fill="none">
+  <path d="M55.5 26.4L58.9 0H0V26.4H55.5Z" fill="white"/>
+  <path d="M39.9 147.4L49.6 72.3H0V256.7H60.6L80.1 147.4H39.9Z" fill="#3688FF"/>
+  <path d="M192.4 59.4C182.8 40.2 169 25.6 150.9 15.3 145.5 12.3 139.8 9.7 133.7 7.5L115.4 103.7H159.8L76.3 256.7H83.4C109.5 256.7 131.7 251.6 150.2 241.2 168.6 230.9 182.7 216.1 192.4 197 202.1 177.8 206.9 154.8 206.9 128 206.9 101.3 202.1 78.5 192.4 59.4Z" fill="#3688FF"/>
+</svg>`;
+
+function createRepoBanner() {
+  return `
+  <div class="banner" style="height:280px;">
+    <div class="layer layer-gradient"></div>
+    <div class="layer layer-glow"></div>
+    <div class="content" style="flex-direction:row;gap:28px;align-items:center;">
+      ${THUNDER_LOGO_MAIN}
+      <span style="font-size:72px;font-weight:800;color:white;letter-spacing:-2.5px;line-height:1;">Thunder<span style="color:#3688FF;">ID</span></span>
+    </div>
+  </div>`;
+}
+
+const banners = document.getElementById('banners');
+banners.innerHTML = createRepoBanner() + sdks.map(createBanner).join('');
+</script>
+</body>
+</html>
