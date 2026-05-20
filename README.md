@@ -28,7 +28,7 @@ Add an entry to the `sdks` array in `thunderid-banners.html`:
 ## Banners
 
 | Banner | Type |
-|---|---|
+| --- | --- |
 | ThunderID | Main repo |
 | `@thunderid/browser` | Official SDK |
 | `@thunderid/javascript` | Official SDK |
@@ -40,4 +40,5 @@ Add an entry to the `sdks` array in `thunderid-banners.html`:
 | `@thunderid/nuxt` | Official SDK |
 | `@thunderid/react-router` | Official Integration |
 | `@thunderid/tanstack-router` | Official Integration |
+| `npx thunderid` | Official CLI |
 | `@thunderid/skills` | Official Skills |
